@@ -21,6 +21,14 @@ class ListService {
     }
   }
 
+  async getListDetails(userId, listId) {
+    const list = await listRepository.getListDetails(listId, userId);
+    if (!list) {
+      throw new Error('List not found or access denied');
+    }
+    return list;
+  }
+
   async addProblemToList(userId, listId, problemId) {
     // Verify list belongs to user
     const list = await listRepository.getListById(listId, userId);

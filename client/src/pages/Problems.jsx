@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import { CheckCircle, Search, ChevronDown } from 'lucide-react';
 import './Problems.css';
 
 const Problems = () => {
+  const navigate = useNavigate();
   const [problems, setProblems] = useState([]);
   const [lists, setLists] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -115,9 +117,14 @@ const Problems = () => {
           </thead>
           <tbody>
             {problems.map((prob, index) => (
-              <tr key={prob.id}>
+              <tr key={prob.id} className="problem-row">
                 <td className="font-mono" style={{ color: 'var(--text-secondary)' }}>{index + 1}</td>
-                <td style={{ fontWeight: '500' }}>{prob.title}</td>
+                <td 
+                  style={{ fontWeight: '500', cursor: 'pointer', color: 'var(--accent-primary)' }}
+                  onClick={() => navigate(`/problems/${prob.id}`)}
+                >
+                  {prob.title}
+                </td>
                 <td>
                   <span className={`diff-badge ${prob.difficulty.toLowerCase()}`}>
                     {prob.difficulty}
@@ -138,10 +145,10 @@ const Problems = () => {
                     ) : (
                       <button 
                         className="mark-solved-btn"
-                        onClick={() => handleSolve(prob.id)} 
+                        onClick={() => navigate(`/problems/${prob.id}`)} 
                         disabled={submitting}
                       >
-                        Mark Solved
+                        Solve Problem
                       </button>
                     )}
                     

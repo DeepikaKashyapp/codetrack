@@ -30,6 +30,26 @@ class ListRepository {
     return rows[0];
   }
 
+  // Get a specific list with all its problems
+  async getListDetails(listId, userId) {
+    const list = await this.getListById(listId, userId);
+    if (!list) return null;
+
+    const itemsQuery = `
+      SELECT p.*, uli.added_at,
+        CASE WHEN usp.user_id IS NOT NULL THEN true ELSE false END AS "isSolved"
+      FROM user_list_items uli
+      JOIN problems p ON uli.problem_id = p.id
+      LEFT JOIN user_solved_problems usp ON p.id = usp.problem_id AND usp.user_id = $2
+      WHERE uli.list_id = $1
+      ORDER BY uli.added_at DESC;
+    `;
+    const { rows } = await db.query(itemsQuery, [listId, userId]);
+    
+    list.problems = rows;
+    return list;
+  }
+
   // Add a problem to a list
   async addProblemToList(listId, problemId) {
     const query = `

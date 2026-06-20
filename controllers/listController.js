@@ -31,6 +31,23 @@ class ListController {
     }
   }
 
+  async getListDetails(req, res, next) {
+    try {
+      const userId = req.user.id;
+      const { id } = req.params;
+      const listDetails = await listService.getListDetails(userId, id);
+      res.status(200).json({
+        message: 'List details retrieved successfully',
+        data: listDetails
+      });
+    } catch (error) {
+      if (error.message.includes('not found')) {
+        return res.status(404).json({ error: error.message });
+      }
+      next(error);
+    }
+  }
+
   async addProblemToList(req, res, next) {
     try {
       const userId = req.user.id;

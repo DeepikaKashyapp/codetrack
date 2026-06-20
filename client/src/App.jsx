@@ -13,6 +13,8 @@ import Problems from './pages/Problems';
 import LeaderboardTable from './components/LeaderboardTable';
 import AnalyticsCharts from './components/AnalyticsCharts';
 import Profile from './pages/Profile';
+import Workspace from './pages/Workspace';
+import ListView from './pages/ListView';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -47,6 +49,8 @@ const AppLayout = () => {
           <Routes>
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/problems" element={<ProtectedRoute><Problems /></ProtectedRoute>} />
+            <Route path="/problems/:id" element={<ProtectedRoute><Workspace /></ProtectedRoute>} />
+            <Route path="/lists/:id" element={<ProtectedRoute><ListView /></ProtectedRoute>} />
             <Route path="/leaderboard" element={<ProtectedRoute><LeaderboardTable /></ProtectedRoute>} />
             <Route path="/analytics" element={<ProtectedRoute><AnalyticsCharts /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />

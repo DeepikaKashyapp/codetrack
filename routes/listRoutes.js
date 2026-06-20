@@ -8,6 +8,7 @@ router.use(authMiddleware); // All list routes require authentication
 
 router.get('/', listController.getUserLists);
 router.post('/', listController.createList);
+router.get('/:id', listController.getListDetails);
 router.post('/add', listController.addProblemToList);
 
 module.exports = router;

@@ -1,4 +1,6 @@
 const submissionService = require('../services/submissionService');
+const executionService = require('../services/executionService');
+const db = require('../config/db');
 
 class SubmissionController {
   async submitProblem(req, res, next) {
@@ -39,6 +41,59 @@ class SubmissionController {
         data: result.submissions,
         pagination: result.pagination
       });
+    } catch (error) {
+      next(error);
+    }
+  }
+  async runCode(req, res, next) {
+    try {
+      const { code, problemId } = req.body;
+      
+      // Fetch test cases from database
+      const query = 'SELECT test_cases FROM problems WHERE id = $1';
+      const { rows } = await db.query(query, [problemId]);
+      
+      let testCases = [];
+      if (rows.length > 0 && rows[0].test_cases) {
+        testCases = rows[0].test_cases;
+      }
+
+      // We only run the first test case for "Run Code" (sample test case)
+      const sampleTests = testCases.slice(0, 1);
+      
+      const result = await executionService.executeJavaScript(code, sampleTests);
+      res.status(200).json({ data: result });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async submitCode(req, res, next) {
+    try {
+      const { code, problemId } = req.body;
+      const userId = req.user.id;
+
+      // Fetch all test cases
+      const query = 'SELECT test_cases FROM problems WHERE id = $1';
+      const { rows } = await db.query(query, [problemId]);
+      
+      let testCases = [];
+      if (rows.length > 0 && rows[0].test_cases) {
+        testCases = rows[0].test_cases;
+      }
+
+      const result = await executionService.executeJavaScript(code, testCases);
+
+      // If all passed, we mark it as solved
+      if (result.success && result.allPassed) {
+        try {
+          await submissionService.submitProblem(userId, problemId, 'Solved via IDE');
+        } catch (submitErr) {
+          // Ignore "already solved" error
+        }
+      }
+
+      res.status(200).json({ data: result });
     } catch (error) {
       next(error);
     }

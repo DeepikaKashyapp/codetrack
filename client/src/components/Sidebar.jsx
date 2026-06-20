@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, BookOpen, Trophy, BarChart2, Settings, LogOut, Code2, GraduationCap, ChevronDown, Star, ClipboardList, Lock, Plus, List as ListIcon } from 'lucide-react';
+import { LayoutDashboard, BookOpen, Trophy, BarChart2, Settings, LogOut, Code2, GraduationCap, ChevronDown, Star, ClipboardList, Lock, Plus, List as ListIcon, CheckCircle } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
 import './Sidebar.css';
 
@@ -100,21 +100,29 @@ const Sidebar = () => {
         </div>
         
         {isCreatingList && (
-          <form onSubmit={handleCreateList} className="create-list-form" style={{ padding: '0 12px 12px 12px' }}>
+          <form onSubmit={handleCreateList} className="create-list-form" style={{ padding: '0 12px 12px 12px', display: 'flex', gap: '8px' }}>
             <input 
               type="text" 
               placeholder="List name..." 
               value={newListName}
               onChange={(e) => setNewListName(e.target.value)}
-              style={{ width: '100%', padding: '4px 8px', borderRadius: '4px', background: 'var(--bg-card)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', fontSize: '13px' }}
+              style={{ flex: 1, padding: '4px 8px', borderRadius: '4px', background: 'var(--bg-card)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', fontSize: '13px' }}
               autoFocus
             />
+            <button type="submit" style={{ background: 'var(--success)', border: 'none', borderRadius: '4px', padding: '0 8px', color: '#fff', cursor: 'pointer' }}>
+              <CheckCircle size={14} />
+            </button>
           </form>
         )}
 
         <div className="sidebar-list">
           {lists.map(list => (
-            <div className="list-item" key={list.id}>
+            <div 
+              className="list-item" 
+              key={list.id} 
+              style={{ cursor: 'pointer' }}
+              onClick={() => navigate(`/lists/${list.id}`)}
+            >
               <div className="list-item-left">
                 <div className="list-icon-wrapper bg-white">
                   {list.name === 'Favorite' ? (

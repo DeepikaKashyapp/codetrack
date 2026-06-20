@@ -8,6 +8,8 @@ const router = express.Router();
 router.use(authMiddleware);
 
 router.post('/', submissionController.submitProblem);
-router.get('/my-submissions', submissionController.getUserSubmissions);
+router.get('/user', submissionController.getUserSubmissions);
+router.post('/run', submissionController.runCode);
+router.post('/submit', submissionController.submitCode);
 
 module.exports = router;

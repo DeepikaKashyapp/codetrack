@@ -20,15 +20,30 @@ const Workspace = () => {
 
   const CPP_TEMPLATE = `#include <iostream>
 #include <vector>
-#include <string>
+#include <unordered_map>
 
 using namespace std;
 
+class Solution {
+public:
+    vector<int> twoSum(vector<int>& nums, int target) {
+        // Write your C++ code here
+        
+        return {};
+    }
+};
+
 int main() {
-    // Write your C++ code here to test your logic
-    // Print the output to the console
+    // We execute the raw C++ file, so you must provide a main function to test your logic!
+    Solution sol;
+    vector<int> nums = {2, 7, 11, 15};
+    vector<int> res = sol.twoSum(nums, 9);
     
-    cout << "Hello C++!" << endl;
+    if(res.size() == 2) {
+        cout << "Output: [" << res[0] << ", " << res[1] << "]" << endl;
+    } else {
+        cout << "No solution returned" << endl;
+    }
     
     return 0;
 }`;

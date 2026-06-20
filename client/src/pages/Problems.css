@@ -1,0 +1,101 @@
+.problems-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.filters-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-color);
+  padding: 8px 16px;
+  border-radius: 4px;
+  width: 300px;
+}
+
+.search-input {
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  width: 100%;
+  outline: none;
+}
+
+.search-input::placeholder {
+  color: var(--text-secondary);
+}
+
+.dropdowns {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.dropdown-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+}
+
+.dropdown-btn:hover {
+  color: var(--text-primary);
+  background: transparent;
+}
+
+.results-count {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  padding-left: 16px;
+  border-left: 1px solid var(--border-color);
+}
+
+/* Problems Table specific */
+.problems-table th {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-color);
+  border-top: none;
+}
+
+.problems-table td {
+  padding: 16px 20px;
+  border-bottom: 1px solid #222;
+}
+
+.tags-container {
+  display: flex;
+  gap: 8px;
+}
+
+.tag-chip {
+  background: #2a2a2a;
+  color: #aaaaaa;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+}
+
+.mark-solved-btn {
+  background: transparent;
+  border: 1px solid #444;
+  color: var(--text-secondary);
+  padding: 6px 12px;
+  font-size: 0.85rem;
+}
+
+.mark-solved-btn:hover {
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+  background: rgba(255, 85, 0, 0.1);
+}

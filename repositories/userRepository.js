@@ -5,7 +5,7 @@ class UserRepository {
     const query = `
       INSERT INTO users (username, email, password_hash)
       VALUES ($1, $2, $3)
-      RETURNING id, username, email, created_at;
+      RETURNING id, username, email, created_at, bio, location, github_url, leetcode_url;
     `;
     const values = [username, email, passwordHash];
     const { rows } = await db.query(query, values);
@@ -19,7 +19,7 @@ class UserRepository {
   }
 
   async findById(id) {
-    const query = 'SELECT id, username, email, created_at FROM users WHERE id = $1;';
+    const query = 'SELECT id, username, email, created_at, bio, location, github_url, leetcode_url FROM users WHERE id = $1;';
     const { rows } = await db.query(query, [id]);
     return rows[0];
   }
@@ -32,6 +32,18 @@ class UserRepository {
   async findByRefreshToken(token) {
     const query = 'SELECT * FROM users WHERE refresh_token = $1;';
     const { rows } = await db.query(query, [token]);
+    return rows[0];
+  }
+
+  async updateProfile(userId, { bio, location, github_url, leetcode_url }) {
+    const query = `
+      UPDATE users 
+      SET bio = $1, location = $2, github_url = $3, leetcode_url = $4
+      WHERE id = $5
+      RETURNING id, username, email, created_at, bio, location, github_url, leetcode_url;
+    `;
+    const values = [bio, location, github_url, leetcode_url, userId];
+    const { rows } = await db.query(query, values);
     return rows[0];
   }
 }

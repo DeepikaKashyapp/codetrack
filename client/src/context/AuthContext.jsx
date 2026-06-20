@@ -7,21 +7,40 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem('token') || null);
   const [loading, setLoading] = useState(true);
 
-  // In a real app we would validate the token against the backend or decode it
+  // Fetch user profile on load to persist data
   useEffect(() => {
-    if (token) {
-      localStorage.setItem('token', token);
-      // Setting a dummy user since our backend login returns the user object 
-      // but we lose it on hard refresh. Realistically we should fetch it.
-      if (!user) {
-        setUser({ authenticated: true });
+    const fetchUser = async () => {
+      if (token) {
+        localStorage.setItem('token', token);
+        try {
+          const res = await fetch('http://localhost:5000/api/users/profile', {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          const data = await res.json();
+          if (res.ok) {
+            setUser(data.data);
+          } else {
+            // Token might be expired/invalid
+            localStorage.removeItem('token');
+            setToken(null);
+            setUser(null);
+          }
+        } catch (error) {
+          console.error("Failed to fetch user profile", error);
+        }
+      } else {
+        localStorage.removeItem('token');
+        setUser(null);
       }
-    } else {
-      localStorage.removeItem('token');
-      setUser(null);
-    }
-    setLoading(false);
+      setLoading(false);
+    };
+
+    fetchUser();
   }, [token]);
+
+  const updateUser = (newData) => {
+    setUser(prev => ({ ...prev, ...newData }));
+  };
 
   const login = (newToken, userData) => {
     setToken(newToken);
@@ -34,7 +53,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, token, login, logout, loading, updateUser }}>
       {!loading && children}
     </AuthContext.Provider>
   );

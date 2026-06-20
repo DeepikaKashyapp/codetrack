@@ -1,6 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
+import { UserPlus } from 'lucide-react';
 
 const Register = () => {
   const [username, setUsername] = useState('');
@@ -35,37 +36,39 @@ const Register = () => {
   return (
     <div className="flex-center" style={{ minHeight: '70vh' }}>
       <div className="glass-panel" style={{ width: '100%', maxWidth: '400px' }}>
-        <h2 style={{ marginBottom: '24px', textAlign: 'center' }}>Create Account</h2>
-        {error && <div style={{ color: 'var(--error)', marginBottom: '16px', textAlign: 'center' }}>{error}</div>}
+        <h2 className="font-mono" style={{ marginBottom: '24px', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+          <UserPlus color="var(--accent-primary)" /> SYSTEM.INIT
+        </h2>
+        {error && <div className="font-mono" style={{ color: 'var(--error)', marginBottom: '16px', textAlign: 'center', fontSize: '0.9em' }}>[ERROR]: {error}</div>}
         <form onSubmit={handleRegister}>
           <input 
             type="text" 
-            placeholder="Username" 
-            className="input-field"
+            placeholder="username" 
+            className="input-field font-mono"
             value={username}
             onChange={e => setUsername(e.target.value)}
             required
           />
           <input 
             type="email" 
-            placeholder="Email Address" 
-            className="input-field"
+            placeholder="user@domain.com" 
+            className="input-field font-mono"
             value={email}
             onChange={e => setEmail(e.target.value)}
             required
           />
           <input 
             type="password" 
-            placeholder="Password" 
-            className="input-field"
+            placeholder="********" 
+            className="input-field font-mono"
             value={password}
             onChange={e => setPassword(e.target.value)}
             required
           />
-          <button type="submit" style={{ width: '100%', marginTop: '12px' }}>Sign Up</button>
+          <button type="submit" className="font-mono" style={{ width: '100%', marginTop: '12px', textTransform: 'uppercase' }}>Initialize User</button>
         </form>
-        <p style={{ marginTop: '20px', textAlign: 'center', color: 'var(--text-secondary)' }}>
-          Already have an account? <Link to="/login">Log in</Link>
+        <p className="font-mono" style={{ marginTop: '20px', textAlign: 'center', color: 'var(--text-secondary)', fontSize: '0.9em' }}>
+          Token exists? <Link to="/login">Authenticate</Link>
         </p>
       </div>
     </div>

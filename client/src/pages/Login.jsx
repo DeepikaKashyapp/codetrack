@@ -1,6 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
+import { LogIn } from 'lucide-react';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -34,29 +35,31 @@ const Login = () => {
   return (
     <div className="flex-center" style={{ minHeight: '70vh' }}>
       <div className="glass-panel" style={{ width: '100%', maxWidth: '400px' }}>
-        <h2 style={{ marginBottom: '24px', textAlign: 'center' }}>Welcome Back</h2>
-        {error && <div style={{ color: 'var(--error)', marginBottom: '16px', textAlign: 'center' }}>{error}</div>}
+        <h2 className="font-mono" style={{ marginBottom: '24px', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+          <LogIn color="var(--accent-primary)" /> SYSTEM.LOGIN
+        </h2>
+        {error && <div className="font-mono" style={{ color: 'var(--error)', marginBottom: '16px', textAlign: 'center', fontSize: '0.9em' }}>[ERROR]: {error}</div>}
         <form onSubmit={handleLogin}>
           <input 
             type="email" 
-            placeholder="Email Address" 
-            className="input-field"
+            placeholder="user@domain.com" 
+            className="input-field font-mono"
             value={email}
             onChange={e => setEmail(e.target.value)}
             required
           />
           <input 
             type="password" 
-            placeholder="Password" 
-            className="input-field"
+            placeholder="********" 
+            className="input-field font-mono"
             value={password}
             onChange={e => setPassword(e.target.value)}
             required
           />
-          <button type="submit" style={{ width: '100%', marginTop: '12px' }}>Login</button>
+          <button type="submit" className="font-mono" style={{ width: '100%', marginTop: '12px', textTransform: 'uppercase' }}>Authenticate</button>
         </form>
-        <p style={{ marginTop: '20px', textAlign: 'center', color: 'var(--text-secondary)' }}>
-          Don't have an account? <Link to="/register">Sign up</Link>
+        <p className="font-mono" style={{ marginTop: '20px', textAlign: 'center', color: 'var(--text-secondary)', fontSize: '0.9em' }}>
+          No access? <Link to="/register">Create token</Link>
         </p>
       </div>
     </div>

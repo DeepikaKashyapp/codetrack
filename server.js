@@ -33,6 +33,7 @@ app.get('/health', async (req, res) => {
 });
 
 const authRoutes = require('./routes/authRoutes');
+const userRoutes = require('./routes/userRoutes');
 const problemRoutes = require('./routes/problemRoutes');
 const submissionRoutes = require('./routes/submissionRoutes');
 const leaderboardRoutes = require('./routes/leaderboardRoutes');
@@ -40,6 +41,7 @@ const analyticsRoutes = require('./routes/analyticsRoutes');
 
 // Routes will be mounted here
 app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
 app.use('/api/problems', problemRoutes);
 app.use('/api/submissions', submissionRoutes);
 app.use('/api/leaderboard', leaderboardRoutes);

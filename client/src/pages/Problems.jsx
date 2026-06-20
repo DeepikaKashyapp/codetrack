@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
+import { CheckCircle, Search, ChevronDown } from 'lucide-react';
+import './Problems.css';
 
 const Problems = () => {
   const [problems, setProblems] = useState([]);
@@ -7,6 +9,7 @@ const Problems = () => {
   const [submitting, setSubmitting] = useState(false);
   const { token } = useContext(AuthContext);
 
+  // For demonstration, let's inject a mock 'acceptance rate' and 'status' since backend doesn't have it explicitly right now
   useEffect(() => {
     const fetchProblems = async () => {
       try {
@@ -15,7 +18,12 @@ const Problems = () => {
         });
         const data = await response.json();
         if (response.ok) {
-          setProblems(data.data);
+          const formatted = data.data.map(p => ({
+            ...p,
+            acceptance: (Math.random() * (70 - 20) + 20).toFixed(1) + '%', // Mock 20-70%
+            isSolved: Math.random() > 0.6 // Mock solved status
+          }));
+          setProblems(formatted);
         }
       } catch (error) {
         console.error('Error fetching problems', error);
@@ -40,7 +48,7 @@ const Problems = () => {
       const data = await response.json();
       if (response.ok) {
         alert(`Problem solved! You earned ${data.data.pointsEarned} points.`);
-        // In a real app we'd update UI state to show it's solved, but we just alert for now.
+        setProblems(problems.map(p => p.id === problemId ? { ...p, isSolved: true } : p));
       } else {
         alert(data.error?.message || 'Failed to submit problem');
       }
@@ -51,52 +59,71 @@ const Problems = () => {
     }
   };
 
-  if (loading) return <div>Loading Problems...</div>;
+  if (loading) return <div>Loading Problems Library...</div>;
 
   return (
-    <div>
-      <h1 style={{ fontSize: '2.5rem', marginBottom: '24px' }}>DSA Problems</h1>
-      <div className="glass-panel" style={{ overflowX: 'auto' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+    <div className="problems-wrapper">
+      <div className="filters-bar">
+        <div className="search-box">
+          <Search size={16} color="var(--text-secondary)" />
+          <input type="text" placeholder="Search problems..." className="search-input" />
+        </div>
+        <div className="dropdowns">
+          <button className="dropdown-btn">Difficulty: All <ChevronDown size={14} /></button>
+          <button className="dropdown-btn">Tags: All <ChevronDown size={14} /></button>
+          <button className="dropdown-btn">Status: All <ChevronDown size={14} /></button>
+          <span className="results-count font-mono">{problems.length} results</span>
+        </div>
+      </div>
+
+      <div className="glass-panel" style={{ padding: 0 }}>
+        <table className="problems-table">
           <thead>
-            <tr style={{ borderBottom: '1px solid var(--border-color)' }}>
-              <th style={{ padding: '12px 8px', color: 'var(--text-secondary)' }}>ID</th>
-              <th style={{ padding: '12px 8px', color: 'var(--text-secondary)' }}>Title</th>
-              <th style={{ padding: '12px 8px', color: 'var(--text-secondary)' }}>Difficulty</th>
-              <th style={{ padding: '12px 8px', color: 'var(--text-secondary)' }}>Tags</th>
-              <th style={{ padding: '12px 8px', color: 'var(--text-secondary)' }}>Action</th>
+            <tr>
+              <th>#</th>
+              <th>TITLE</th>
+              <th>DIFFICULTY</th>
+              <th>TAGS</th>
+              <th>ACCEPTANCE</th>
+              <th>STATUS</th>
             </tr>
           </thead>
           <tbody>
-            {problems.map((prob) => (
-              <tr key={prob.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                <td style={{ padding: '12px 8px' }}>{prob.id}</td>
-                <td style={{ padding: '12px 8px', fontWeight: '500' }}>{prob.title}</td>
-                <td style={{ padding: '12px 8px' }}>
-                  <span style={{ 
-                    color: prob.difficulty === 'Easy' ? 'var(--success)' : 
-                           prob.difficulty === 'Medium' ? 'var(--warning)' : 'var(--error)' 
-                  }}>
+            {problems.map((prob, index) => (
+              <tr key={prob.id}>
+                <td className="font-mono" style={{ color: 'var(--text-secondary)' }}>{index + 1}</td>
+                <td style={{ fontWeight: '500' }}>{prob.title}</td>
+                <td>
+                  <span className={`diff-badge ${prob.difficulty.toLowerCase()}`}>
                     {prob.difficulty}
                   </span>
                 </td>
-                <td style={{ padding: '12px 8px', fontSize: '0.9em', color: 'var(--text-secondary)' }}>
-                  {prob.tags?.join(', ') || 'N/A'}
+                <td>
+                  <div className="tags-container">
+                    {prob.tags?.slice(0,2).map(tag => (
+                      <span key={tag} className="tag-chip">{tag}</span>
+                    ))}
+                  </div>
                 </td>
-                <td style={{ padding: '12px 8px' }}>
-                  <button 
-                    onClick={() => handleSolve(prob.id)} 
-                    disabled={submitting}
-                    style={{ padding: '6px 12px', fontSize: '0.9em' }}
-                  >
-                    Mark Solved
-                  </button>
+                <td className="font-mono subtext">{prob.acceptance}</td>
+                <td>
+                  {prob.isSolved ? (
+                    <span className="status-badge success"><CheckCircle size={14}/> Solved</span>
+                  ) : (
+                    <button 
+                      className="mark-solved-btn"
+                      onClick={() => handleSolve(prob.id)} 
+                      disabled={submitting}
+                    >
+                      Mark Solved
+                    </button>
+                  )}
                 </td>
               </tr>
             ))}
             {problems.length === 0 && (
               <tr>
-                <td colSpan="5" style={{ padding: '20px', textAlign: 'center', color: 'var(--text-secondary)' }}>No problems available.</td>
+                <td colSpan="6" style={{ padding: '20px', textAlign: 'center', color: 'var(--text-secondary)' }}>No problems available.</td>
               </tr>
             )}
           </tbody>

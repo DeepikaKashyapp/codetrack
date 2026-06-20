@@ -5,9 +5,8 @@
   z-index: 1000;
   padding: 16px 0;
   border-radius: 0;
-  border-top: none;
-  border-left: none;
-  border-right: none;
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--bg-color);
 }
 
 .navbar-container {
@@ -41,10 +40,11 @@
 .nav-item {
   color: var(--text-secondary);
   font-weight: 500;
+  transition: color 0.2s;
 }
 
 .nav-item:hover {
-  color: var(--text-primary);
+  color: var(--accent-primary);
 }
 
 .logout-btn {
@@ -54,9 +54,7 @@
 }
 
 .logout-btn:hover {
-  background: rgba(239, 68, 68, 0.1);
-  color: var(--error);
-  border-color: rgba(239, 68, 68, 0.3);
-  box-shadow: none;
-  transform: none;
+  background: transparent;
+  color: var(--accent-primary);
+  border-color: var(--accent-primary);
 }

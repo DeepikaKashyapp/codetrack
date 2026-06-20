@@ -28,6 +28,8 @@ class AnalyticsRepository {
     `;
     const { rows } = await db.query(query, [userId]);
     return rows;
+  }
+
   async getProfileStats(userId) {
     // 1. Get breakdown of solved problems by difficulty
     const statsQuery = `

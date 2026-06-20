@@ -12,10 +12,26 @@ const Workspace = () => {
 
   const [problem, setProblem] = useState(null);
   const [code, setCode] = useState('');
+  const [language, setLanguage] = useState('javascript');
   const [output, setOutput] = useState('');
   const [isRunning, setIsRunning] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [testResults, setTestResults] = useState(null);
+
+  const CPP_TEMPLATE = `#include <iostream>
+#include <vector>
+#include <string>
+
+using namespace std;
+
+int main() {
+    // Write your C++ code here to test your logic
+    // Print the output to the console
+    
+    cout << "Hello C++!" << endl;
+    
+    return 0;
+}`;
 
   useEffect(() => {
     const fetchProblem = async () => {
@@ -50,7 +66,7 @@ const Workspace = () => {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify({ code, problemId: id })
+        body: JSON.stringify({ code, problemId: id, language })
       });
       const data = await res.json();
       if (res.ok) {
@@ -78,7 +94,7 @@ const Workspace = () => {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify({ code, problemId: id })
+        body: JSON.stringify({ code, problemId: id, language })
       });
       const data = await res.json();
       if (res.ok) {
@@ -129,13 +145,29 @@ const Workspace = () => {
         {/* Right Pane: Code Editor + Terminal */}
         <div className="editor-pane glass-panel">
           <div className="editor-header">
-            <div className="lang-selector font-mono">JavaScript</div>
+            <select 
+              className="lang-selector font-mono" 
+              value={language} 
+              onChange={(e) => {
+                const newLang = e.target.value;
+                setLanguage(newLang);
+                if (newLang === 'cpp') {
+                  setCode(CPP_TEMPLATE);
+                } else {
+                  setCode(problem?.default_code || '// Write your JavaScript code here\\n');
+                }
+              }}
+              style={{ cursor: 'pointer', outline: 'none' }}
+            >
+              <option value="javascript">JavaScript</option>
+              <option value="cpp">C++</option>
+            </select>
             <Maximize2 size={14} color="var(--text-secondary)" style={{cursor: 'pointer'}} />
           </div>
           <div className="editor-container">
             <Editor
               height="100%"
-              defaultLanguage="javascript"
+              language={language === 'cpp' ? 'cpp' : 'javascript'}
               theme="vs-dark"
               value={code}
               onChange={(value) => setCode(value)}

@@ -47,7 +47,7 @@ class SubmissionController {
   }
   async runCode(req, res, next) {
     try {
-      const { code, problemId } = req.body;
+      const { code, problemId, language } = req.body;
       
       // Fetch test cases from database
       const query = 'SELECT test_cases FROM problems WHERE id = $1';
@@ -58,10 +58,15 @@ class SubmissionController {
         testCases = rows[0].test_cases;
       }
 
-      // We only run the first test case for "Run Code" (sample test case)
-      const sampleTests = testCases.slice(0, 1);
+      let result;
+      if (language === 'cpp') {
+        result = await executionService.executeCpp(code);
+      } else {
+        // We only run the first test case for "Run Code" (sample test case)
+        const sampleTests = testCases.slice(0, 1);
+        result = await executionService.executeJavaScript(code, sampleTests);
+      }
       
-      const result = await executionService.executeJavaScript(code, sampleTests);
       res.status(200).json({ data: result });
     } catch (error) {
       next(error);
@@ -70,7 +75,7 @@ class SubmissionController {
 
   async submitCode(req, res, next) {
     try {
-      const { code, problemId } = req.body;
+      const { code, problemId, language } = req.body;
       const userId = req.user.id;
 
       // Fetch all test cases
@@ -82,12 +87,17 @@ class SubmissionController {
         testCases = rows[0].test_cases;
       }
 
-      const result = await executionService.executeJavaScript(code, testCases);
+      let result;
+      if (language === 'cpp') {
+        result = await executionService.executeCpp(code);
+      } else {
+        result = await executionService.executeJavaScript(code, testCases);
+      }
 
       // If all passed, we mark it as solved
       if (result.success && result.allPassed) {
         try {
-          await submissionService.submitProblem(userId, problemId, 'Solved via IDE');
+          await submissionService.submitProblem(userId, problemId, `Solved via IDE (${language || 'javascript'})`);
         } catch (submitErr) {
           // Ignore "already solved" error
         }

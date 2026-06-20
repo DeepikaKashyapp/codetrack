@@ -9,7 +9,7 @@ const LeaderboardTable = () => {
   useEffect(() => {
     const fetchLeaderboard = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/leaderboard');
+        const response = await fetch((import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api/leaderboard');
         const data = await response.json();
         if (response.ok) {
           // Add some mock data for streak/country to match UI

@@ -13,7 +13,7 @@ export const AuthProvider = ({ children }) => {
       if (token) {
         localStorage.setItem('token', token);
         try {
-          const res = await fetch('http://localhost:5000/api/users/profile', {
+          const res = await fetch((import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api/users/profile', {
             headers: { Authorization: `Bearer ${token}` }
           });
           const data = await res.json();

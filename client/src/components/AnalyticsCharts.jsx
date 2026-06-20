@@ -33,8 +33,8 @@ const AnalyticsCharts = () => {
     const fetchAnalytics = async () => {
       try {
         const [dailyRes, topicRes] = await Promise.all([
-          fetch('http://localhost:5000/api/analytics/daily', { headers: { Authorization: `Bearer ${token}` } }),
-          fetch('http://localhost:5000/api/analytics/topics', { headers: { Authorization: `Bearer ${token}` } })
+          fetch((import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api/analytics/daily', { headers: { Authorization: `Bearer ${token}` } }),
+          fetch((import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api/analytics/topics', { headers: { Authorization: `Bearer ${token}` } })
         ]);
         
         // Use real data where available, otherwise fallback

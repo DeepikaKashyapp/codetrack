@@ -13,7 +13,7 @@ const Problems = () => {
   useEffect(() => {
     const fetchProblems = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/problems', {
+        const response = await fetch((import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api/problems', {
           headers: { Authorization: `Bearer ${token}` }
         });
         const data = await response.json();
@@ -37,7 +37,7 @@ const Problems = () => {
   const handleSolve = async (problemId) => {
     setSubmitting(true);
     try {
-      const response = await fetch('http://localhost:5000/api/submissions', {
+      const response = await fetch((import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api/submissions', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',

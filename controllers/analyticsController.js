@@ -26,6 +26,19 @@ class AnalyticsController {
       next(error);
     }
   }
+
+  async getProfileStats(req, res, next) {
+    try {
+      const userId = req.user.id;
+      const data = await analyticsService.getProfileStats(userId);
+      res.status(200).json({
+        message: 'Profile stats retrieved successfully',
+        data
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 module.exports = new AnalyticsController();

@@ -9,5 +9,6 @@ router.use(authMiddleware);
 
 router.get('/daily', analyticsController.getDailySubmissions);
 router.get('/topics', analyticsController.getTopicBreakdown);
+router.get('/profile', analyticsController.getProfileStats);
 
 module.exports = router;

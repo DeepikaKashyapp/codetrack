@@ -24,11 +24,17 @@ class ProblemService {
     }
   }
 
-  async getProblems(page = 1, limit = 20, difficulty, tagsString) {
+  async getProblems(page = 1, limit = 20, difficulty, tagsString, userId = null) {
     const offset = (page - 1) * limit;
     const tags = tagsString ? tagsString.split(',').map(t => t.trim()) : null;
 
-    const result = await problemRepository.findAll(limit, offset, difficulty, tags);
+    let result;
+    if (userId) {
+      // Fetch problems with solved status for the user
+      result = await problemRepository.findAllWithSolvedStatus(userId, limit, offset, difficulty, tags);
+    } else {
+      result = await problemRepository.findAll(limit, offset, difficulty, tags);
+    }
     
     return {
       problems: result.data,

@@ -60,6 +60,55 @@ class ProblemRepository {
     const { rows } = await db.query(query, [id]);
     return rows[0];
   }
+
+  async findAllWithSolvedStatus(userId, limit, offset, difficulty, tags) {
+    let query = `
+      SELECT p.*, 
+             CASE WHEN usp.user_id IS NOT NULL THEN true ELSE false END AS "isSolved"
+      FROM problems p
+      LEFT JOIN user_solved_problems usp ON p.id = usp.problem_id AND usp.user_id = $1
+      WHERE 1=1
+    `;
+    const values = [userId];
+    let counter = 2;
+
+    if (difficulty) {
+      query += ` AND p.difficulty = $${counter++}`;
+      values.push(difficulty);
+    }
+
+    if (tags && tags.length > 0) {
+      query += ` AND p.tags && $${counter++}`;
+      values.push(tags);
+    }
+
+    query += ` ORDER BY p.id ASC LIMIT $${counter++} OFFSET $${counter++}`;
+    values.push(limit, offset);
+
+    const { rows } = await db.query(query, values);
+    
+    // Get total count for pagination
+    let countQuery = 'SELECT COUNT(*) FROM problems p WHERE 1=1';
+    const countValues = [];
+    let countCounter = 1;
+
+    if (difficulty) {
+      countQuery += ` AND p.difficulty = $${countCounter++}`;
+      countValues.push(difficulty);
+    }
+
+    if (tags && tags.length > 0) {
+      countQuery += ` AND p.tags && $${countCounter++}`;
+      countValues.push(tags);
+    }
+
+    const { rows: countRows } = await db.query(countQuery, countValues);
+    
+    return {
+      data: rows,
+      total: parseInt(countRows[0].count, 10)
+    };
+  }
 }
 
 module.exports = new ProblemRepository();

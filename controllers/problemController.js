@@ -19,7 +19,8 @@ class ProblemController {
   async getProblems(req, res, next) {
     try {
       const { page, limit, difficulty, tags } = req.query;
-      const result = await problemService.getProblems(page, limit, difficulty, tags);
+      const userId = req.user?.id;
+      const result = await problemService.getProblems(page, limit, difficulty, tags, userId);
       res.status(200).json({
         message: 'Problems retrieved successfully',
         data: result.problems,

@@ -38,6 +38,7 @@ const problemRoutes = require('./routes/problemRoutes');
 const submissionRoutes = require('./routes/submissionRoutes');
 const leaderboardRoutes = require('./routes/leaderboardRoutes');
 const analyticsRoutes = require('./routes/analyticsRoutes');
+const listRoutes = require('./routes/listRoutes');
 
 // Routes will be mounted here
 app.use('/api/auth', authRoutes);
@@ -46,6 +47,7 @@ app.use('/api/problems', problemRoutes);
 app.use('/api/submissions', submissionRoutes);
 app.use('/api/leaderboard', leaderboardRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/lists', listRoutes);
 
 // Global Error Handler
 app.use((err, req, res, next) => {

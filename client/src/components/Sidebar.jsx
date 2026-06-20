@@ -1,12 +1,60 @@
-import React, { useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, BookOpen, Trophy, BarChart2, Settings, LogOut, Code2, GraduationCap, ChevronDown, Star, ClipboardList, Lock, Plus } from 'lucide-react';
+import { LayoutDashboard, BookOpen, Trophy, BarChart2, Settings, LogOut, Code2, GraduationCap, ChevronDown, Star, ClipboardList, Lock, Plus, List as ListIcon } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
 import './Sidebar.css';
 
 const Sidebar = () => {
-  const { user, logout } = useContext(AuthContext);
+  const { user, logout, token } = useContext(AuthContext);
   const navigate = useNavigate();
+  const [lists, setLists] = useState([]);
+  const [isCreatingList, setIsCreatingList] = useState(false);
+  const [newListName, setNewListName] = useState('');
+
+  useEffect(() => {
+    if (token) {
+      fetchLists();
+    }
+  }, [token]);
+
+  const fetchLists = async () => {
+    try {
+      const response = await fetch((import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api/lists', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setLists(data.data);
+      }
+    } catch (err) {
+      console.error('Error fetching lists', err);
+    }
+  };
+
+  const handleCreateList = async (e) => {
+    e.preventDefault();
+    if (!newListName.trim()) return;
+    try {
+      const response = await fetch((import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api/lists', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ name: newListName })
+      });
+      if (response.ok) {
+        setNewListName('');
+        setIsCreatingList(false);
+        fetchLists();
+      } else {
+        const errData = await response.json();
+        alert(errData.error || 'Failed to create list');
+      }
+    } catch (err) {
+      alert('Error creating list');
+    }
+  };
 
   const handleLogout = () => {
     logout();
@@ -46,29 +94,42 @@ const Sidebar = () => {
         <div className="sidebar-section-header">
           <span className="section-title">My Lists</span>
           <div className="section-actions">
-            <Plus size={16} className="action-icon" />
+            <Plus size={16} className="action-icon" onClick={() => setIsCreatingList(!isCreatingList)} style={{ cursor: 'pointer' }} />
             <ChevronDown size={16} className="action-icon" />
           </div>
         </div>
+        
+        {isCreatingList && (
+          <form onSubmit={handleCreateList} className="create-list-form" style={{ padding: '0 12px 12px 12px' }}>
+            <input 
+              type="text" 
+              placeholder="List name..." 
+              value={newListName}
+              onChange={(e) => setNewListName(e.target.value)}
+              style={{ width: '100%', padding: '4px 8px', borderRadius: '4px', background: 'var(--bg-card)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', fontSize: '13px' }}
+              autoFocus
+            />
+          </form>
+        )}
+
         <div className="sidebar-list">
-          <div className="list-item">
-            <div className="list-item-left">
-              <div className="list-icon-wrapper bg-white">
-                <Star size={14} color="#FF5500" fill="#FF5500" />
+          {lists.map(list => (
+            <div className="list-item" key={list.id}>
+              <div className="list-item-left">
+                <div className="list-icon-wrapper bg-white">
+                  {list.name === 'Favorite' ? (
+                    <Star size={14} color="#FF5500" fill="#FF5500" />
+                  ) : list.name === 'To Do' ? (
+                    <ClipboardList size={14} color="#4A90E2" />
+                  ) : (
+                    <ListIcon size={14} color="#8E8E93" />
+                  )}
+                </div>
+                <span>{list.name}</span>
               </div>
-              <span>Favorite</span>
+              {list.is_default && <Lock size={14} className="lock-icon" />}
             </div>
-            <Lock size={14} className="lock-icon" />
-          </div>
-          <div className="list-item">
-            <div className="list-item-left">
-              <div className="list-icon-wrapper bg-white">
-                <ClipboardList size={14} color="#4A90E2" />
-              </div>
-              <span>to do</span>
-            </div>
-            <Lock size={14} className="lock-icon" />
-          </div>
+          ))}
         </div>
       </div>
 

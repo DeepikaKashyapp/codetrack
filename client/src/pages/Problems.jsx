@@ -5,33 +5,36 @@ import './Problems.css';
 
 const Problems = () => {
   const [problems, setProblems] = useState([]);
+  const [lists, setLists] = useState([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [openDropdownId, setOpenDropdownId] = useState(null);
   const { token } = useContext(AuthContext);
 
   // For demonstration, let's inject a mock 'acceptance rate' and 'status' since backend doesn't have it explicitly right now
   useEffect(() => {
-    const fetchProblems = async () => {
+    const fetchProblemsAndLists = async () => {
       try {
-        const response = await fetch((import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api/problems', {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        const data = await response.json();
-        if (response.ok) {
-          const formatted = data.data.map(p => ({
-            ...p,
-            acceptance: (Math.random() * (70 - 20) + 20).toFixed(1) + '%', // Mock 20-70%
-            isSolved: Math.random() > 0.6 // Mock solved status
-          }));
-          setProblems(formatted);
+        const [probRes, listsRes] = await Promise.all([
+          fetch((import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api/problems', { headers: { Authorization: `Bearer ${token}` } }),
+          fetch((import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api/lists', { headers: { Authorization: `Bearer ${token}` } })
+        ]);
+        
+        if (probRes.ok) {
+          const probData = await probRes.json();
+          setProblems(probData.data);
+        }
+        if (listsRes.ok) {
+          const listsData = await listsRes.json();
+          setLists(listsData.data);
         }
       } catch (error) {
-        console.error('Error fetching problems', error);
+        console.error('Error fetching data', error);
       } finally {
         setLoading(false);
       }
     };
-    if (token) fetchProblems();
+    if (token) fetchProblemsAndLists();
   }, [token]);
 
   const handleSolve = async (problemId) => {
@@ -56,6 +59,28 @@ const Problems = () => {
       alert('Error submitting problem');
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleAddToList = async (problemId, listId) => {
+    try {
+      const response = await fetch((import.meta.env.VITE_API_URL || 'http://localhost:5000') + '/api/lists/add', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ problemId, listId })
+      });
+      const data = await response.json();
+      if (response.ok) {
+        alert('Added to list!');
+        setOpenDropdownId(null);
+      } else {
+        alert(data.error || 'Failed to add to list');
+      }
+    } catch (err) {
+      alert('Error adding to list');
     }
   };
 
@@ -105,19 +130,49 @@ const Problems = () => {
                     ))}
                   </div>
                 </td>
-                <td className="font-mono subtext">{prob.acceptance}</td>
+                <td className="font-mono subtext">{prob.acceptance || '—'}</td>
                 <td>
-                  {prob.isSolved ? (
-                    <span className="status-badge success"><CheckCircle size={14}/> Solved</span>
-                  ) : (
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center', position: 'relative' }}>
+                    {prob.isSolved ? (
+                      <span className="status-badge success"><CheckCircle size={14}/> Solved</span>
+                    ) : (
+                      <button 
+                        className="mark-solved-btn"
+                        onClick={() => handleSolve(prob.id)} 
+                        disabled={submitting}
+                      >
+                        Mark Solved
+                      </button>
+                    )}
+                    
                     <button 
-                      className="mark-solved-btn"
-                      onClick={() => handleSolve(prob.id)} 
-                      disabled={submitting}
+                      className="mark-solved-btn" 
+                      style={{ padding: '4px 8px', background: 'var(--bg-card)' }}
+                      onClick={() => setOpenDropdownId(openDropdownId === prob.id ? null : prob.id)}
                     >
-                      Mark Solved
+                      <ChevronDown size={14} />
                     </button>
-                  )}
+                    
+                    {openDropdownId === prob.id && (
+                      <div className="list-dropdown" style={{
+                        position: 'absolute', top: '100%', right: '0', background: 'var(--bg-card)', 
+                        border: '1px solid var(--border-color)', borderRadius: '4px', padding: '4px 0', zIndex: 10,
+                        minWidth: '120px', boxShadow: '0 4px 12px rgba(0,0,0,0.5)'
+                      }}>
+                        {lists.map(list => (
+                          <div 
+                            key={list.id} 
+                            onClick={() => handleAddToList(prob.id, list.id)}
+                            style={{ padding: '6px 12px', cursor: 'pointer', fontSize: '13px', color: 'var(--text-primary)' }}
+                            onMouseEnter={(e) => e.target.style.background = 'var(--bg-hover)'}
+                            onMouseLeave={(e) => e.target.style.background = 'transparent'}
+                          >
+                            {list.name}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </td>
               </tr>
             ))}
